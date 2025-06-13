@@ -166,7 +166,7 @@ const PhotoCarouselView: React.FC<{ images: StoredImage[] }> = ({ images }) => {
 
   return (
     <div className="relative w-full max-w-xs sm:max-w-sm flex flex-col items-center group">
-      <Card className="bg-card text-card-foreground border-border p-3 pb-10 md:p-4 md:pb-12 rounded-lg shadow-xl transform group-hover:scale-105 transition-transform duration-300">
+      <Card className="bg-card text-card-foreground border-border p-3 md:p-4 rounded-lg shadow-xl transform group-hover:scale-105 transition-transform duration-300">
         <div className="aspect-[3/4] w-full relative overflow-hidden rounded-md bg-muted">
           {currentImage && currentImage.imageUrl ? ( 
              // Local images will not start with 'data:', so this condition will primarily hit the 'else' block.
@@ -354,16 +354,21 @@ export default function PublicViewPage() {
         <div className="text-center text-muted-foreground mt-6 sm:mt-8 px-2">
           <p className="text-base sm:text-lg">Seu espaço está um pouco vazio...</p>
           <p className="mt-1 sm:mt-2 text-sm sm:text-base">
-            Você pode acessar o dashboard diretamente pela URL /dashboard para adicionar suas memórias!
+             Acesse o <Link href="/dashboard" className="text-primary hover:underline">dashboard</Link> para adicionar suas memórias!
           </p>
         </div>
       )}
 
       <footer className="py-6 sm:py-8 text-center text-xs sm:text-sm text-muted-foreground/80">
         <p>Amor em Detalhes &copy; {new Date().getFullYear()}</p>
+        <Link href="/dashboard" className="mt-2 inline-block text-primary hover:underline text-xs">
+          <Edit className="inline-block mr-1 h-3 w-3" /> Acessar Dashboard
+        </Link>
       </footer>
     </div>
   );
 }
+
+    
 
     
