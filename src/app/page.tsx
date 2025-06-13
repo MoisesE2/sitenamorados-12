@@ -166,30 +166,19 @@ const PhotoCarouselView: React.FC<{ images: StoredImage[] }> = ({ images }) => {
 
   return (
     <div className="relative w-full max-w-xs sm:max-w-sm flex flex-col items-center group">
-      <Card className="bg-card text-card-foreground border-border p-3 md:p-4 rounded-lg shadow-xl transform group-hover:scale-105 transition-transform duration-300">
+      <Card className="w-full bg-card text-card-foreground border-border p-3 md:p-4 rounded-lg shadow-xl transform group-hover:scale-105 transition-transform duration-300">
         <div className="aspect-[3/4] w-full relative overflow-hidden rounded-md bg-muted">
           {currentImage && currentImage.imageUrl ? ( 
-             // Local images will not start with 'data:', so this condition will primarily hit the 'else' block.
-             currentImage.imageUrl.startsWith('data:') ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img 
-                    src={currentImage.imageUrl} 
-                    alt={currentImage.name || "Lembrança do casal"} 
-                    className="object-cover w-full h-full transition-opacity duration-500 ease-in-out"
-                    data-ai-hint={currentImage.hint || "uploaded couple love"}
-                />
-             ) : (
-                <Image
-                  key={currentImage.id || currentIndex} 
-                  src={currentImage.imageUrl} // This will be e.g., /assets/image-1.jpg
-                  alt={currentImage.name || "Lembrança do casal"}
-                  fill={true}
-                  className="object-cover transition-opacity duration-500 ease-in-out"
-                  data-ai-hint={currentImage.hint || "couple love"}
-                  sizes="(max-width: 640px) 80vw, (max-width: 768px) 50vw, 33vw"
-                  priority={currentIndex === 0} 
-                />
-             )
+            <Image
+              key={currentImage.id || currentIndex} 
+              src={currentImage.imageUrl} 
+              alt={currentImage.name || "Lembrança do casal"}
+              fill={true}
+              className="object-cover transition-opacity duration-500 ease-in-out"
+              data-ai-hint={currentImage.hint || "couple love"}
+              sizes="(max-width: 640px) 80vw, (max-width: 768px) 50vw, 33vw"
+              priority={currentIndex === 0} 
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <ImageOff className="w-16 h-16 text-muted-foreground" />
@@ -228,9 +217,6 @@ export default function PublicViewPage() {
   const [isLoadingPagePrefs, setIsLoadingPagePrefs] = useState(true);
   const mounted = useMounted();
   
-  // Photos from localStorage are no longer used for the main carousel here.
-  // const initialPhotos = useMemo(() => [], []); 
-  // const [photosFromStorage] = useLocalStorage<StoredImage[]>("amorDigitalPhotos", initialPhotos);
   const [localStorageTheme, setLocalStorageTheme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
 
   useEffect(() => {
@@ -239,7 +225,7 @@ export default function PublicViewPage() {
     const fetchPreferences = async () => {
       setIsLoadingPagePrefs(true);
       try {
-        const response = await fetch('/api/preferences', { cache: 'no-store' }); // Added cache: 'no-store'
+        const response = await fetch('/api/preferences', { cache: 'no-store' }); 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -263,13 +249,6 @@ export default function PublicViewPage() {
 
     fetchPreferences();
   }, [mounted, localStorageTheme, setLocalStorageTheme]);
-
-  // validPhotosForCarousel is removed as we are using localCarouselImages directly.
-  // const validPhotosForCarousel = useMemo(() => {
-  //   if (!mounted) return [];
-  //   const photos = Array.isArray(photosFromStorage) ? photosFromStorage : [];
-  //   return photos.filter(p => p && p.imageUrl && p.imageUrl.trim() !== "");
-  // }, [mounted, photosFromStorage]);
 
 
   if (!mounted || isLoadingPagePrefs) {
@@ -368,7 +347,3 @@ export default function PublicViewPage() {
     </div>
   );
 }
-
-    
-
-    
