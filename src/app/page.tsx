@@ -1,7 +1,6 @@
-
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Edit, Heart, ImageOff, Loader2 } from "lucide-react";
@@ -32,7 +31,6 @@ const defaultPreferences: ServerPreferences = {
   theme: "light",
 };
 
-// Define local images for the carousel
 const localCarouselImages: StoredImage[] = [
   { id: 'image-1', name: 'Imagem 1', imageUrl: '/assets/image-1.jpg', uploadedAt: 0, hint: "love couple" },
   { id: 'image-2', name: 'Imagem 2', imageUrl: '/assets/image-2.jpg', uploadedAt: 0, hint: "romance nature" },
@@ -43,15 +41,12 @@ const localCarouselImages: StoredImage[] = [
   { id: 'image-7', name: 'Imagem 7', imageUrl: '/assets/image-7.jpg', uploadedAt: 0, hint: "special date" },
 ];
 
-
 const AnniversaryTextView: React.FC<{ anniversaryDate: string | null }> = ({ anniversaryDate }) => {
-  const [durationText, setDurationText] = useState<string>("Carregando tempo juntos...");
+  const [durationText, setDurationText] = useState("Carregando tempo juntos...");
   const mounted = useMounted();
 
   useEffect(() => {
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
     if (!anniversaryDate) {
       setDurationText("Por favor, defina a data do aniversário no dashboard.");
       return;
@@ -63,6 +58,7 @@ const AnniversaryTextView: React.FC<{ anniversaryDate: string | null }> = ({ ann
         setDurationText("Data do aniversário inválida.");
         return;
       }
+
       const now = new Date();
       if (now < startDate) {
         setDurationText("Nosso tempo especial ainda vai começar!");
@@ -72,35 +68,32 @@ const AnniversaryTextView: React.FC<{ anniversaryDate: string | null }> = ({ ann
       let years = now.getFullYear() - startDate.getFullYear();
       let months = now.getMonth() - startDate.getMonth();
       let days = now.getDate() - startDate.getDate();
-      
+
       if (days < 0) {
         const prevMonthDays = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
         days += prevMonthDays;
         months--;
       }
-      if (months < 0) { months += 12; years--; }
-      
-      if (years < 0) { 
-        setDurationText("Ainda estamos para começar nossa jornada!");
-        return;
+
+      if (months < 0) {
+        months += 12;
+        years--;
       }
 
       const parts = [];
       if (years > 0) parts.push(`${years} ano${years > 1 ? 's' : ''}`);
       if (months > 0) parts.push(`${months} ${months > 1 ? 'meses' : 'mês'}`);
       if (days > 0) parts.push(`${days} dia${days > 1 ? 's' : ''}`);
-      
-      if (parts.length === 0 && startDate <= now) {
-         setDurationText("Eu te amo há alguns segundos!"); 
-      } else if (parts.length > 0) {
-         setDurationText(`Eu te amo há ${parts.join(', ')}.`);
+
+      if (parts.length === 0) {
+        setDurationText("Eu te amo há alguns segundos!");
       } else {
-         setDurationText("Calculando nosso tempo juntos..."); 
+        setDurationText(`Eu te amo há ${parts.join(', ')}.`);
       }
     };
 
     calculateDuration();
-    const intervalId = setInterval(calculateDuration, 60000); 
+    const intervalId = setInterval(calculateDuration, 60000);
     return () => clearInterval(intervalId);
   }, [anniversaryDate, mounted]);
 
@@ -111,29 +104,21 @@ const PhotoCarouselView: React.FC<{ images: StoredImage[] }> = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const mounted = useMounted();
 
-  // The 'images' prop will now be localCarouselImages
   const validImages = useMemo(() => {
-    if (!mounted) return []; 
-    // Filter out any potential invalid entries, though localCarouselImages should be well-defined
-    return images.filter(img => img && img.imageUrl && img.imageUrl.trim() !== "");
+    if (!mounted) return [];
+    return images.filter(img => img && img.imageUrl);
   }, [images, mounted]);
 
   useEffect(() => {
     if (!mounted) return;
-
-    if (validImages.length > 0 && currentIndex >= validImages.length) {
-      setCurrentIndex(0);
-    } else if (validImages.length === 0 && currentIndex !== 0) {
-      setCurrentIndex(0);
-    }
+    if (currentIndex >= validImages.length) setCurrentIndex(0);
   }, [validImages, currentIndex, mounted]);
-
 
   if (!mounted) {
     return (
       <div className="flex flex-col items-center justify-center bg-card p-4 rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm aspect-[3/4]">
         <Loader2 className="w-16 h-16 text-muted-foreground animate-spin" />
-         <p className="mt-3 text-sm text-center text-muted-foreground">Carregando fotos...</p>
+        <p className="mt-3 text-sm text-center text-muted-foreground">Carregando fotos...</p>
       </div>
     );
   }
@@ -142,48 +127,32 @@ const PhotoCarouselView: React.FC<{ images: StoredImage[] }> = ({ images }) => {
     return (
       <div className="flex flex-col items-center justify-center bg-card p-4 rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm aspect-[3/4]">
         <Image
-          src="https://placehold.co/300x400.png" 
+          src="https://placehold.co/300x400.png"
           alt="Nenhuma imagem local configurada"
           width={300}
           height={400}
           className="rounded-md object-contain"
-          data-ai-hint="placeholder empty"
         />
         <p className="mt-3 text-sm text-center text-muted-foreground">Configure as imagens locais em /public/assets.</p>
       </div>
     );
   }
 
-  const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? validImages.length - 1 : prevIndex - 1));
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === validImages.length - 1 ? 0 : prevIndex + 1));
-  };
-
-  const currentImage = validImages[currentIndex]; 
+  const currentImage = validImages[currentIndex];
 
   return (
     <div className="relative w-full max-w-xs sm:max-w-sm flex flex-col items-center group">
-      <Card className="w-full bg-card text-card-foreground border-border p-3 md:p-4 rounded-lg shadow-xl transform group-hover:scale-105 transition-transform duration-300">
+      <Card className="w-full bg-card text-card-foreground border-border p-3 md:p-4 rounded-lg shadow-xl">
         <div className="aspect-[3/4] w-full relative overflow-hidden rounded-md bg-muted">
-          {currentImage && currentImage.imageUrl ? ( 
-            <Image
-              key={currentImage.id || currentIndex} 
-              src={currentImage.imageUrl} 
-              alt={currentImage.name || "Lembrança do casal"}
-              fill={true}
-              className="object-cover transition-opacity duration-500 ease-in-out"
-              data-ai-hint={currentImage.hint || "couple love"}
-              sizes="(max-width: 640px) 80vw, (max-width: 768px) 50vw, 33vw"
-              priority={currentIndex === 0} 
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <ImageOff className="w-16 h-16 text-muted-foreground" />
-            </div>
-          )}
+          <Image
+            key={currentImage.id}
+            src={currentImage.imageUrl}
+            alt={currentImage.name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 640px) 80vw, (max-width: 768px) 50vw, 33vw"
+            priority={currentIndex === 0}
+          />
         </div>
       </Card>
       {validImages.length > 1 && (
@@ -191,18 +160,16 @@ const PhotoCarouselView: React.FC<{ images: StoredImage[] }> = ({ images }) => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={goToPrevious}
-            className="absolute left-[-20px] sm:left-[-35px] md:left-[-50px] top-1/2 -translate-y-1/2 transform bg-card/40 hover:bg-card/70 text-card-foreground rounded-full backdrop-blur-sm shadow-md"
-            aria-label="Foto anterior"
+            onClick={() => setCurrentIndex((i) => (i === 0 ? validImages.length - 1 : i - 1))}
+            className="absolute left-[-20px] sm:left-[-35px] md:left-[-50px] top-1/2 -translate-y-1/2 transform bg-card/40 hover:bg-card/70 text-card-foreground rounded-full"
           >
             <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            onClick={goToNext}
-            className="absolute right-[-20px] sm:right-[-35px] md:right-[-50px] top-1/2 -translate-y-1/2 transform bg-card/40 hover:bg-card/70 text-card-foreground rounded-full backdrop-blur-sm shadow-md"
-            aria-label="Próxima foto"
+            onClick={() => setCurrentIndex((i) => (i === validImages.length - 1 ? 0 : i + 1))}
+            className="absolute right-[-20px] sm:right-[-35px] md:right-[-50px] top-1/2 -translate-y-1/2 transform bg-card/40 hover:bg-card/70 text-card-foreground rounded-full"
           >
             <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
           </Button>
@@ -216,8 +183,7 @@ export default function PublicViewPage() {
   const [preferences, setPreferences] = useState<ServerPreferences | null>(null);
   const [isLoadingPagePrefs, setIsLoadingPagePrefs] = useState(true);
   const mounted = useMounted();
-  
-  const [localStorageTheme, setLocalStorageTheme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
+  const [theme, setTheme] = useLocalStorage<'light' | 'dark'>("theme", "light");
 
   useEffect(() => {
     if (!mounted) return;
@@ -225,31 +191,32 @@ export default function PublicViewPage() {
     const fetchPreferences = async () => {
       setIsLoadingPagePrefs(true);
       try {
-        const response = await fetch('/api/preferences', { cache: 'no-store' }); 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data: ServerPreferences = await response.json();
+        const res = await fetch("/api/preferences", { cache: "no-store" });
+        const data: ServerPreferences = await res.json();
         setPreferences(data);
-        if (data.theme && data.theme !== localStorageTheme) {
-          setLocalStorageTheme(data.theme);
-        }
-        document.documentElement.classList.remove('light', 'dark');
-        document.documentElement.classList.add(data.theme || localStorageTheme);
 
-      } catch (error) {
-        console.error("Failed to load preferences for public page:", error);
-        setPreferences(defaultPreferences); 
-        document.documentElement.classList.remove('light', 'dark');
-        document.documentElement.classList.add(localStorageTheme);
+        const serverTheme = data.theme || "light";
+        setTheme(serverTheme);
+        document.documentElement.classList.remove("light", "dark");
+        document.documentElement.classList.add(serverTheme);
+      } catch {
+        setPreferences(defaultPreferences);
+        document.documentElement.classList.remove("light", "dark");
+        document.documentElement.classList.add(theme);
       } finally {
         setIsLoadingPagePrefs(false);
       }
     };
 
     fetchPreferences();
-  }, [mounted, localStorageTheme, setLocalStorageTheme]);
+  }, [mounted]);
 
+  useEffect(() => {
+    if (mounted) {
+      document.documentElement.classList.remove("light", "dark");
+      document.documentElement.classList.add(theme);
+    }
+  }, [theme, mounted]);
 
   if (!mounted || isLoadingPagePrefs) {
     return (
@@ -259,91 +226,60 @@ export default function PublicViewPage() {
       </div>
     );
   }
-  
-  const currentPrefs = preferences || defaultPreferences;
-  const displayCoupleNames: [string, string] = currentPrefs.coupleNames || defaultPreferences.coupleNames || ["Você", "Seu Amor"];
-  const nameDisplayPreference = currentPrefs.nameDisplayPreference || defaultPreferences.nameDisplayPreference;
-  const definingPhrase = currentPrefs.definingPhrase || defaultPreferences.definingPhrase;
-  const anniversaryDate = currentPrefs.anniversaryDate || defaultPreferences.anniversaryDate;
-  const playlistUrl = currentPrefs.playlistUrl || defaultPreferences.playlistUrl;
 
-  let headerContent;
-  if (nameDisplayPreference === 'user1') {
-    headerContent = (
-      <span className="flex items-center justify-center">
-        {displayCoupleNames[0]}
-        <Heart className="ml-2 h-7 w-7 sm:h-8 sm:w-8 text-primary inline-block fill-current" />
-      </span>
+  const prefs = preferences || defaultPreferences;
+  const [name1, name2] = prefs.coupleNames || ["Você", "Seu Amor"];
+  const nameDisplay = prefs.nameDisplayPreference || "both";
+  const definingPhrase = prefs.definingPhrase;
+  const anniversaryDate = prefs.anniversaryDate;
+  const playlistUrl = prefs.playlistUrl;
+
+  const coupleHeader =
+    nameDisplay === "user1" ? (
+      <>{name1} <Heart className="inline h-6 w-6 text-primary fill-current ml-1" /></>
+    ) : nameDisplay === "user2" ? (
+      <>{name2} <Heart className="inline h-6 w-6 text-primary fill-current ml-1" /></>
+    ) : (
+      <>{name1} <span className="text-primary mx-2">&amp;</span> {name2}</>
     );
-  } else if (nameDisplayPreference === 'user2') {
-    headerContent = (
-      <span className="flex items-center justify-center">
-        {displayCoupleNames[1]}
-        <Heart className="ml-2 h-7 w-7 sm:h-8 sm:w-8 text-primary inline-block fill-current" />
-      </span>
-    );
-  } else { 
-    headerContent = (
-      <>
-        {displayCoupleNames[0]} <span className="text-primary mx-1 sm:mx-2">&amp;</span> {displayCoupleNames[1]}
-      </>
-    );
-  }
-  
+
   return (
-    <div className="min-h-screen w-full flex flex-col items-center p-4 sm:p-6 md:p-8 space-y-8 sm:space-y-12 md:space-y-16 bg-background text-foreground font-body">
-      <div className="absolute top-4 right-4 flex items-center gap-2 z-50">
-        <ThemeSwitcher serverTheme={currentPrefs.theme} />
+    <div className="min-h-screen w-full flex flex-col items-center p-4 space-y-12 bg-background text-foreground font-body">
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeSwitcher theme={theme} onChange={setTheme} />
       </div>
 
-      <header className="text-center mt-16 sm:mt-12">
-        <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl tracking-tight text-foreground">
-          {headerContent}
-        </h1>
+      <header className="text-center mt-16">
+        <h1 className="font-headline text-5xl tracking-tight">{coupleHeader}</h1>
       </header>
 
-      <section className="w-full flex justify-center px-2">
-        {/* Pass local images to the carousel view */}
+      <section className="w-full flex justify-center">
         <PhotoCarouselView images={localCarouselImages} />
       </section>
 
       <section className="w-full max-w-2xl px-2">
         <AnniversaryTextView anniversaryDate={anniversaryDate} />
       </section>
-      
+
       {playlistUrl && (
-        <section className="w-full max-w-xl md:max-w-2xl space-y-3 sm:space-y-4 text-center px-2">
-          <h2 className="font-headline text-2xl sm:text-3xl text-foreground">Nossa Trilha Sonora</h2>
-          <div className="rounded-lg overflow-hidden shadow-xl">
-            <PlaylistEmbedder isPublicView={true} initialPlaylistUrl={playlistUrl} /> 
-          </div>
+        <section className="w-full max-w-xl text-center space-y-4">
+          <h2 className="font-headline text-3xl">Nossa Trilha Sonora</h2>
+          <PlaylistEmbedder isPublicView initialPlaylistUrl={playlistUrl} />
         </section>
       )}
 
-      {definingPhrase && definingPhrase.trim() !== "" && (
-        <section className="w-full max-w-xl md:max-w-2xl space-y-3 sm:space-y-4 text-center px-2">
-          <h2 className="font-headline text-2xl sm:text-3xl text-foreground">Uma frase que nos define</h2>
-          <blockquote className="text-lg sm:text-xl md:text-2xl italic text-muted-foreground p-4 sm:p-6 border-l-4 border-primary bg-card/50 rounded-md shadow-sm">
-            <p>"{definingPhrase}"</p>
+      {definingPhrase && (
+        <section className="w-full max-w-xl text-center space-y-4">
+          <h2 className="font-headline text-3xl">Uma frase que nos define</h2>
+          <blockquote className="italic text-muted-foreground border-l-4 border-primary p-4 bg-card/40 rounded-md">
+            “{definingPhrase}”
           </blockquote>
         </section>
       )}
-      
-      {!playlistUrl && (!definingPhrase || definingPhrase.trim() === "") && !anniversaryDate && localCarouselImages.length === 0 && (
-        <div className="text-center text-muted-foreground mt-6 sm:mt-8 px-2">
-          <p className="text-base sm:text-lg">Seu espaço está um pouco vazio...</p>
-          <p className="mt-1 sm:mt-2 text-sm sm:text-base">
-             Acesse o <Link href="/dashboard" className="text-primary hover:underline">dashboard</Link> para adicionar suas memórias!
-          </p>
-        </div>
-      )}
 
-      <footer className="py-6 sm:py-8 text-center text-xs sm:text-sm text-muted-foreground/80">
-        <p>Amor em Detalhes &copy; {new Date().getFullYear()}</p>
-        <Link href="/dashboard" className="mt-2 inline-block text-primary hover:underline text-xs">
-          <Edit className="inline-block mr-1 h-3 w-3" /> Acessar Dashboard
-        </Link>
-      </footer>
+<footer className="text-center text-muted-foreground text-sm py-6">
+  <p>Amor em Detalhes &copy; {new Date().getFullYear()}</p>
+</footer>
     </div>
   );
 }
