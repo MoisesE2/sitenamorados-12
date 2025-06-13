@@ -13,7 +13,6 @@ import { useMounted } from "@/hooks/useMounted";
 import type { StoredImage } from "@/components/PhotoUploader"; 
 import type { NameDisplayPreference } from "@/components/dashboard/NameDisplayPreferenceEditor";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
-// Firebase auth imports removed as Firebase is no longer used
 
 interface ServerPreferences {
   anniversaryDate: string | null;
@@ -32,6 +31,18 @@ const defaultPreferences: ServerPreferences = {
   nameDisplayPreference: "both",
   theme: "light",
 };
+
+// Define local images for the carousel
+const localCarouselImages: StoredImage[] = [
+  { id: 'image-1', name: 'Imagem 1', imageUrl: '/assets/image-1.jpg', uploadedAt: 0, hint: "love couple" },
+  { id: 'image-2', name: 'Imagem 2', imageUrl: '/assets/image-2.jpg', uploadedAt: 0, hint: "romance nature" },
+  { id: 'image-3', name: 'Imagem 3', imageUrl: '/assets/image-3.jpg', uploadedAt: 0, hint: "happy moment" },
+  { id: 'image-4', name: 'Imagem 4', imageUrl: '/assets/image-4.jpg', uploadedAt: 0, hint: "celebration fun" },
+  { id: 'image-5', name: 'Imagem 5', imageUrl: '/assets/image-5.jpg', uploadedAt: 0, hint: "adventure travel" },
+  { id: 'image-6', name: 'Imagem 6', imageUrl: '/assets/image-6.jpg', uploadedAt: 0, hint: "cozy home" },
+  { id: 'image-7', name: 'Imagem 7', imageUrl: '/assets/image-7.jpg', uploadedAt: 0, hint: "special date" },
+];
+
 
 const AnniversaryTextView: React.FC<{ anniversaryDate: string | null }> = ({ anniversaryDate }) => {
   const [durationText, setDurationText] = useState<string>("Carregando tempo juntos...");
@@ -100,8 +111,10 @@ const PhotoCarouselView: React.FC<{ images: StoredImage[] }> = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const mounted = useMounted();
 
+  // The 'images' prop will now be localCarouselImages
   const validImages = useMemo(() => {
     if (!mounted) return []; 
+    // Filter out any potential invalid entries, though localCarouselImages should be well-defined
     return images.filter(img => img && img.imageUrl && img.imageUrl.trim() !== "");
   }, [images, mounted]);
 
@@ -130,13 +143,13 @@ const PhotoCarouselView: React.FC<{ images: StoredImage[] }> = ({ images }) => {
       <div className="flex flex-col items-center justify-center bg-card p-4 rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm aspect-[3/4]">
         <Image
           src="https://placehold.co/300x400.png" 
-          alt="Placeholder para foto do casal"
+          alt="Nenhuma imagem local configurada"
           width={300}
           height={400}
           className="rounded-md object-contain"
           data-ai-hint="placeholder empty"
         />
-        <p className="mt-3 text-sm text-center text-muted-foreground">Adicione fotos no dashboard!</p>
+        <p className="mt-3 text-sm text-center text-muted-foreground">Configure as imagens locais em /public/assets.</p>
       </div>
     );
   }
@@ -154,24 +167,25 @@ const PhotoCarouselView: React.FC<{ images: StoredImage[] }> = ({ images }) => {
   return (
     <div className="relative w-full max-w-xs sm:max-w-sm flex flex-col items-center group">
       <Card className="bg-card text-card-foreground border-border p-3 pb-10 md:p-4 md:pb-12 rounded-lg shadow-xl transform group-hover:scale-105 transition-transform duration-300">
-        <div className="aspect-[3/4] w-full relative overflow-hidden rounded-md bg-white">
+        <div className="aspect-[3/4] w-full relative overflow-hidden rounded-md bg-muted">
           {currentImage && currentImage.imageUrl ? ( 
+             // Local images will not start with 'data:', so this condition will primarily hit the 'else' block.
              currentImage.imageUrl.startsWith('data:') ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img 
                     src={currentImage.imageUrl} 
                     alt={currentImage.name || "Lembrança do casal"} 
                     className="object-cover w-full h-full transition-opacity duration-500 ease-in-out"
-                    data-ai-hint="uploaded couple love"
+                    data-ai-hint={currentImage.hint || "uploaded couple love"}
                 />
              ) : (
                 <Image
                   key={currentImage.id || currentIndex} 
-                  src={currentImage.imageUrl}
+                  src={currentImage.imageUrl} // This will be e.g., /assets/image-1.jpg
                   alt={currentImage.name || "Lembrança do casal"}
                   fill={true}
                   className="object-cover transition-opacity duration-500 ease-in-out"
-                  data-ai-hint="couple love"
+                  data-ai-hint={currentImage.hint || "couple love"}
                   sizes="(max-width: 640px) 80vw, (max-width: 768px) 50vw, 33vw"
                   priority={currentIndex === 0} 
                 />
@@ -214,8 +228,9 @@ export default function PublicViewPage() {
   const [isLoadingPagePrefs, setIsLoadingPagePrefs] = useState(true);
   const mounted = useMounted();
   
-  const initialPhotos = useMemo(() => [], []); 
-  const [photosFromStorage] = useLocalStorage<StoredImage[]>("amorDigitalPhotos", initialPhotos);
+  // Photos from localStorage are no longer used for the main carousel here.
+  // const initialPhotos = useMemo(() => [], []); 
+  // const [photosFromStorage] = useLocalStorage<StoredImage[]>("amorDigitalPhotos", initialPhotos);
   const [localStorageTheme, setLocalStorageTheme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
 
   useEffect(() => {
@@ -224,25 +239,21 @@ export default function PublicViewPage() {
     const fetchPreferences = async () => {
       setIsLoadingPagePrefs(true);
       try {
-        const response = await fetch('/api/preferences');
+        const response = await fetch('/api/preferences', { cache: 'no-store' }); // Added cache: 'no-store'
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data: ServerPreferences = await response.json();
         setPreferences(data);
-        // Sync server theme with localStorage if different
         if (data.theme && data.theme !== localStorageTheme) {
           setLocalStorageTheme(data.theme);
         }
-        // Apply theme from server/localStorage
         document.documentElement.classList.remove('light', 'dark');
         document.documentElement.classList.add(data.theme || localStorageTheme);
 
       } catch (error) {
         console.error("Failed to load preferences for public page:", error);
-        // Fallback to default or potentially show an error message
         setPreferences(defaultPreferences); 
-        // Apply localStorage theme as fallback
         document.documentElement.classList.remove('light', 'dark');
         document.documentElement.classList.add(localStorageTheme);
       } finally {
@@ -251,13 +262,14 @@ export default function PublicViewPage() {
     };
 
     fetchPreferences();
-  }, [mounted, localStorageTheme, setLocalStorageTheme]); // localStorageTheme related dependencies ensure theme sync
+  }, [mounted, localStorageTheme, setLocalStorageTheme]);
 
-  const validPhotosForCarousel = useMemo(() => {
-    if (!mounted) return [];
-    const photos = Array.isArray(photosFromStorage) ? photosFromStorage : [];
-    return photos.filter(p => p && p.imageUrl && p.imageUrl.trim() !== "");
-  }, [mounted, photosFromStorage]);
+  // validPhotosForCarousel is removed as we are using localCarouselImages directly.
+  // const validPhotosForCarousel = useMemo(() => {
+  //   if (!mounted) return [];
+  //   const photos = Array.isArray(photosFromStorage) ? photosFromStorage : [];
+  //   return photos.filter(p => p && p.imageUrl && p.imageUrl.trim() !== "");
+  // }, [mounted, photosFromStorage]);
 
 
   if (!mounted || isLoadingPagePrefs) {
@@ -303,7 +315,6 @@ export default function PublicViewPage() {
     <div className="min-h-screen w-full flex flex-col items-center p-4 sm:p-6 md:p-8 space-y-8 sm:space-y-12 md:space-y-16 bg-background text-foreground font-body">
       <div className="absolute top-4 right-4 flex items-center gap-2 z-50">
         <ThemeSwitcher serverTheme={currentPrefs.theme} />
-        {/* Botão de Dashboard removido */}
       </div>
 
       <header className="text-center mt-16 sm:mt-12">
@@ -313,7 +324,8 @@ export default function PublicViewPage() {
       </header>
 
       <section className="w-full flex justify-center px-2">
-        <PhotoCarouselView images={validPhotosForCarousel} />
+        {/* Pass local images to the carousel view */}
+        <PhotoCarouselView images={localCarouselImages} />
       </section>
 
       <section className="w-full max-w-2xl px-2">
@@ -338,7 +350,7 @@ export default function PublicViewPage() {
         </section>
       )}
       
-      {!playlistUrl && (!definingPhrase || definingPhrase.trim() === "") && !anniversaryDate && validPhotosForCarousel.length === 0 && (
+      {!playlistUrl && (!definingPhrase || definingPhrase.trim() === "") && !anniversaryDate && localCarouselImages.length === 0 && (
         <div className="text-center text-muted-foreground mt-6 sm:mt-8 px-2">
           <p className="text-base sm:text-lg">Seu espaço está um pouco vazio...</p>
           <p className="mt-1 sm:mt-2 text-sm sm:text-base">
@@ -354,3 +366,4 @@ export default function PublicViewPage() {
   );
 }
 
+    
