@@ -47,7 +47,7 @@ const PlaylistEmbedder: FC<PlaylistEmbedderProps> = ({
                 src={embedSpotifyUrl}
                 width="100%"
                 height="352"
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture; accelerometer; gyroscope; web-share"
                 loading="lazy"
                 title="Spotify Playlist Embed"
               ></iframe>
