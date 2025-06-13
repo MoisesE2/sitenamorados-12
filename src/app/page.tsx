@@ -14,7 +14,6 @@ import type { StoredImage } from "@/components/PhotoUploader";
 import type { NameDisplayPreference } from "@/components/dashboard/NameDisplayPreferenceEditor";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 // Firebase auth imports removed as Firebase is no longer used
-// import { auth, signOut as firebaseSignOut } from "@/lib/firebase"; 
 
 interface ServerPreferences {
   anniversaryDate: string | null;
@@ -304,13 +303,7 @@ export default function PublicViewPage() {
     <div className="min-h-screen w-full flex flex-col items-center p-4 sm:p-6 md:p-8 space-y-8 sm:space-y-12 md:space-y-16 bg-background text-foreground font-body">
       <div className="absolute top-4 right-4 flex items-center gap-2 z-50">
         <ThemeSwitcher serverTheme={currentPrefs.theme} />
-        <Button asChild variant="outline" size="icon" className="bg-card/50 hover:bg-card/70 border-border/30 text-foreground">
-          <Link href="/dashboard">
-            <Edit className="h-5 w-5" />
-            <span className="sr-only">Ir para o Dashboard</span>
-          </Link>
-        </Button>
-        {/* Logout button removed as Firebase Auth is no longer used */}
+        {/* Botão de Dashboard removido */}
       </div>
 
       <header className="text-center mt-16 sm:mt-12">
@@ -349,7 +342,7 @@ export default function PublicViewPage() {
         <div className="text-center text-muted-foreground mt-6 sm:mt-8 px-2">
           <p className="text-base sm:text-lg">Seu espaço está um pouco vazio...</p>
           <p className="mt-1 sm:mt-2 text-sm sm:text-base">
-            Vá para o <Link href="/dashboard" className="underline hover:text-primary">dashboard</Link> para adicionar suas memórias!
+            Você pode acessar o dashboard diretamente pela URL /dashboard para adicionar suas memórias!
           </p>
         </div>
       )}
@@ -360,3 +353,4 @@ export default function PublicViewPage() {
     </div>
   );
 }
+
