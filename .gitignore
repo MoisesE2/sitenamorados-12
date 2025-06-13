@@ -1,0 +1,98 @@
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Next.js
+/.next/
+/out/
+
+# Vercel
+.vercel
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.pem
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Local environment variables
+.env*.local
+!.env.example
+
+# Editor directories and files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.sublime-workspace
+
+# Jest
+/coverage
+.jest
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Gatsby files
+.cache/
+# Comment in the public line in if your project uses Gatsby and not Next.js
+# https://nextjs.org/blog/next-9-1#public-directory-support
+# public
+
+# Mac files
+.AppleDouble
+.LSOverride
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarnclean
+
+# parcel cache files
+.cache
+
+# Turborepo
+.turbo
+
+# Remix files
+.cache
+build/
+public/build/
+app/build/
+
+# Bun
+.bun
