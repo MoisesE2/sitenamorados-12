@@ -37,49 +37,64 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
 
-    /* Sidebar variables - kept from original, adjust if sidebar is used and needs custom theme */
+    /* Sidebar variables - light theme */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-primary: 343 100% 65%; /* Match app primary */
+    --sidebar-primary-foreground: 0 0% 100%; /* Match app primary-foreground */
+    --sidebar-accent: 330 43% 95%; /* Match app muted */
+    --sidebar-accent-foreground: 0 0% 18%; /* Match app foreground for accents on light bg */
+    --sidebar-border: 0 0% 88%; /* Match app border */
+    --sidebar-ring: 343 100% 65%; /* Match app ring */
   }
-  .dark {
-    /* Keeping dark mode variables as placeholders, but main theme is light */
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 343 100% 65%; /* Vibrant pink */
-    --primary-foreground: 0 0% 100%; /* White */
-    --primary-hover-color: 343 100% 62%;
-    --secondary: 357 100% 85%; /* Light coral */
-    --secondary-foreground: 0 0% 18%; /* Dark gray */
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 354 66% 54%; /* Muted Red */
-    --accent-foreground: 0 0% 100%; /* White */
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%; /* Input border color for dark mode */
-    --input-bg: 0 0% 10%; /* Example dark input background */
-    --input-bg-hover: 0 0% 12%; /* Example dark input background hover */
-    --ring: 343 100% 65%; /* Vibrant pink */
 
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+  .dark {
+    --background: 240 10% 3.9%; /* Darker blue-ish gray */
+    --foreground: 0 0% 98%; /* Almost white */
+
+    --card: 240 10% 10%; /* Slightly lighter dark blue-ish gray for cards */
+    --card-foreground: 0 0% 95%; /* Light gray for card text */
+
+    --popover: 240 10% 10%; /* Same as card */
+    --popover-foreground: 0 0% 95%; /* Same as card */
+
+    --primary: 343 100% 65%; /* Vibrant pink - should contrast well */
+    --primary-foreground: 0 0% 100%; /* White */
+    --primary-hover-color: 343 100% 62%; /* Slightly deeper pink */
+
+    --secondary: 350 60% 50%; /* A muted darker pink/coral for dark mode */
+    --secondary-foreground: 0 0% 98%; /* Almost white for text on secondary elements */
+
+    --muted: 240 5% 15%; /* Dark gray for muted elements */
+    --muted-foreground: 0 0% 60%; /* Lighter gray for muted text */
+
+    --accent: 354 70% 60%; /* Muted Red - slightly brighter for dark mode */
+    --accent-foreground: 0 0% 100%; /* White */
+
+    --destructive: 0 70% 50%; /* Destructive red - adjusted for dark */
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5% 20%; /* Darker border */
+    --input: 240 5% 25%; /* Input border for dark mode */
+    --input-bg: 240 5% 15%; /* Dark input background */
+    --input-bg-hover: 240 5% 20%; /* Dark input background hover */
+    --ring: 343 100% 65%; /* Vibrant pink - ring color */
+
+    --chart-1: 12 76% 61%; /* Keep chart colors, ensure they are visible on dark bg */
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    
+    /* Sidebar variables for dark mode */
+    --sidebar-background: 240 10% 8%; /* Very dark for sidebar */
+    --sidebar-foreground: 0 0% 80%; /* Lighter gray for sidebar text */
+    --sidebar-primary: 343 100% 70%; /* Primary color for sidebar accents, slightly lighter */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 240 10% 12%; /* Accent for sidebar items */
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 240 10% 15%;
+    --sidebar-ring: 343 100% 70%;
   }
 }
 
